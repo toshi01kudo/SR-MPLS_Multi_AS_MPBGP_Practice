@@ -1,9 +1,9 @@
 !
-interface Loopback150
+interface Loopback8
  description ***MGMT_IF***
- ip address 100.64.0.15 255.255.255.255
+ ip address 100.64.0.8 255.255.255.255
 !
-router bgp 15
+router bgp 8
  template peer-policy EBGP
   advertisement-interval 5
   soft-reconfiguration inbound
@@ -16,133 +16,124 @@ router bgp 15
   soft-reconfiguration inbound
   allowas-in 3
  exit-peer-policy
-bgp router-id 100.64.0.15
+bgp router-id 100.64.0.8
 timers bgp 15 45
 !
-ip vrf UG-A-15
- rd 100.64.10.15:10
+ip vrf UG-A-18
+ rd 100.64.10.18:10
 !
-interface Loopback15
- description ***MGMT_UG-A-15***
- ip vrf forwarding UG-A-15
- ip address 100.64.10.15 255.255.255.255
+interface Loopback18
+ description ***MGMT_UG-A-18***
+ ip vrf forwarding UG-A-18
+ ip address 100.64.10.18 255.255.255.255
 !
 int g2
  no shut
 !
-int g2.515
- description *** From R15-1A to R1 ***
- encapsulation dot1Q 515
- ip vrf forwarding UG-A-15
- ip address 192.168.19.9 255.255.255.0
+int g2.18
+ description *** From R8-1A to R1 ***
+ encapsulation dot1Q 18
+ ip vrf forwarding UG-A-18
+ ip address 192.168.18.8 255.255.255.0
 !
-router bgp 15
- template peer-session PEER_R15-1A
+router bgp 8
+ template peer-session PEER_R8-1A
   remote-as 65090
-  local-as 65019 no-prepend replace-as
+  local-as 65018 no-prepend replace-as
  exit-peer-session
  !
- address-family ipv4 vrf UG-A-15
-  bgp router-id 100.64.10.15
+ address-family ipv4 vrf UG-A-18
+  bgp router-id 100.64.10.18
   redistribute connected
-  neighbor 192.168.19.1 inherit peer-session PEER_R15-1A
-  neighbor 192.168.19.1 inherit peer-policy EBGP
+  neighbor 192.168.18.1 inherit peer-session PEER_R8-1A
+  neighbor 192.168.18.1 inherit peer-policy EBGP
  exit-address-family
 !
 !
-ip vrf UG-B-35
- rd 100.64.20.35:10
+ip vrf UG-B-38
+ rd 100.64.20.38:20
 !
-interface Loopback35
- description ***MGMT_UG-B-35***
- ip vrf forwarding UG-B-35
- ip address 100.64.20.35 255.255.255.255
+interface Loopback38
+ description ***MGMT_UG-B-38***
+ ip vrf forwarding UG-B-38
+ ip address 100.64.20.38 255.255.255.255
 !
-int g3
- no shut
+int g2.38
+ description *** From R8-1B to R1 ***
+ encapsulation dot1Q 38
+ ip vrf forwarding UG-B-38
+ ip address 192.168.38.8 255.255.255.0
 !
-int g3.535
- description *** From R15-1B to R1 ***
- encapsulation dot1Q 535
- ip vrf forwarding UG-B-35
- ip address 192.168.39.9 255.255.255.0
-!
-router bgp 15
- template peer-session PEER_R15-1B
+router bgp 8
+ template peer-session PEER_R8-1B
   remote-as 65090
-  local-as 65039 no-prepend replace-as
+  local-as 65038 no-prepend replace-as
  exit-peer-session
  !
- address-family ipv4 vrf UG-B-35
-  bgp router-id 100.64.20.35
+ address-family ipv4 vrf UG-B-38
+  bgp router-id 100.64.20.38
   redistribute connected
-  neighbor 192.168.39.1 inherit peer-session PEER_R15-1B
-  neighbor 192.168.39.1 inherit peer-policy EBGP
+  neighbor 192.168.38.1 inherit peer-session PEER_R8-1B
+  neighbor 192.168.38.1 inherit peer-policy EBGP
  exit-address-family
 !
 !
-ip vrf UG-A-25
- rd 100.64.10.25:10
+ip vrf UG-A-28
+ rd 100.64.10.28:10
 !
-interface Loopback25
- description ***MGMT_UG-A-25***
- ip vrf forwarding UG-A-25
- ip address 100.64.10.25 255.255.255.255
+interface Loopback28
+ description ***MGMT_UG-A-28***
+ ip vrf forwarding UG-A-28
+ ip address 100.64.10.28 255.255.255.255
 !
-int g4
- no shut
+int g2.28
+ description *** From R8-2A to R2 ***
+ encapsulation dot1Q 28
+ ip vrf forwarding UG-A-28
+ ip address 192.168.28.8 255.255.255.0
 !
-int g4.525
- description *** From R15-2A to R2 ***
- encapsulation dot1Q 525
- ip vrf forwarding UG-A-25
- ip address 192.168.59.9 255.255.255.0
-!
-router bgp 15
- template peer-session PEER_R15-2A
+router bgp 8
+ template peer-session PEER_R8-2A
   remote-as 65090
-  local-as 65029 no-prepend replace-as
+  local-as 65028 no-prepend replace-as
  exit-peer-session
  !
- address-family ipv4 vrf UG-A-25
-  bgp router-id 100.64.10.25
+ address-family ipv4 vrf UG-A-28
+  bgp router-id 100.64.10.28
   redistribute connected
-  neighbor 192.168.29.2 inherit peer-session PEER_R15-2A
-  neighbor 192.168.29.2 inherit peer-policy EBGP
+  neighbor 192.168.28.2 inherit peer-session PEER_R8-2A
+  neighbor 192.168.28.2 inherit peer-policy EBGP
  exit-address-family
 !
 !
-ip vrf UG-B-45
- rd 100.64.20.45:10
+ip vrf UG-B-48
+ rd 100.64.20.48:20
 !
-interface Loopback45
- description ***MGMT_UG-B-45***
- ip vrf forwarding UG-B-45
- ip address 100.64.20.45 255.255.255.255
+interface Loopback48
+ description ***MGMT_UG-B-48***
+ ip vrf forwarding UG-B-48
+ ip address 100.64.20.48 255.255.255.255
 !
-router bgp 15
+router bgp 8
 !
- address-family ipv4 vrf UG-B-45
-  bgp router-id 100.64.20.45
+ address-family ipv4 vrf UG-B-48
+  bgp router-id 100.64.20.48
   redistribute connected
 !
-int g5
- no shut
+int g2.48
+ description *** From R8-2B to R2 ***
+ encapsulation dot1Q 48
+ ip vrf forwarding UG-B-48
+ ip address 192.168.48.8 255.255.255.0
 !
-int g5.545
- description *** From R15-2B to R2 ***
- encapsulation dot1Q 545
- ip vrf forwarding UG-B-45
- ip address 192.168.49.9 255.255.255.0
-!
-router bgp 15
- template peer-session PEER_R15-2B
+router bgp 8
+ template peer-session PEER_R8-2B
   remote-as 65090
-  local-as 65049 no-prepend replace-as
+  local-as 65048 no-prepend replace-as
  exit-peer-session
  !
- address-family ipv4 vrf UG-B-45
-  neighbor 192.168.49.2 inherit peer-session PEER_R15-2B
-  neighbor 192.168.49.2 inherit peer-policy EBGP
+ address-family ipv4 vrf UG-B-48
+  neighbor 192.168.48.2 inherit peer-session PEER_R8-2B
+  neighbor 192.168.48.2 inherit peer-policy EBGP
  exit-address-family
 !
