@@ -4,7 +4,9 @@ Practice repository - Upload the config to work.
 ## Network diagram
 ### Layer 3 IP assignment
 * Inner-AS: ```192.168.xx.xx/24```
+  * Octet 3: Link ID
 * Inter-AS: ```172.24.xx.xx/24```
+  * Octet 3: Link ID
 * Mgmt IP: ```100.64.x.x/32```
   * Octet 3: 
     * UG-A: 10
