@@ -34,7 +34,7 @@ int g2.18
  description *** From R8-1A to R1 ***
  encapsulation dot1Q 18
  ip vrf forwarding UG-A-18
- ip address 192.168.18.8 255.255.255.0
+ ip address 172.24.18.8 255.255.255.0
 !
 router bgp 8
  template peer-session PEER_R8-1A
@@ -45,8 +45,8 @@ router bgp 8
  address-family ipv4 vrf UG-A-18
   bgp router-id 100.64.10.18
   redistribute connected
-  neighbor 192.168.18.1 inherit peer-session PEER_R8-1A
-  neighbor 192.168.18.1 inherit peer-policy EBGP
+  neighbor 172.24.18.1 inherit peer-session PEER_R8-1A
+  neighbor 172.24.18.1 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -62,7 +62,7 @@ int g2.38
  description *** From R8-1B to R1 ***
  encapsulation dot1Q 38
  ip vrf forwarding UG-B-38
- ip address 192.168.38.8 255.255.255.0
+ ip address 172.24.38.8 255.255.255.0
 !
 router bgp 8
  template peer-session PEER_R8-1B
@@ -73,8 +73,8 @@ router bgp 8
  address-family ipv4 vrf UG-B-38
   bgp router-id 100.64.20.38
   redistribute connected
-  neighbor 192.168.38.1 inherit peer-session PEER_R8-1B
-  neighbor 192.168.38.1 inherit peer-policy EBGP
+  neighbor 172.24.38.1 inherit peer-session PEER_R8-1B
+  neighbor 172.24.38.1 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -90,7 +90,7 @@ int g2.28
  description *** From R8-2A to R2 ***
  encapsulation dot1Q 28
  ip vrf forwarding UG-A-28
- ip address 192.168.28.8 255.255.255.0
+ ip address 172.24.28.8 255.255.255.0
 !
 router bgp 8
  template peer-session PEER_R8-2A
@@ -101,8 +101,8 @@ router bgp 8
  address-family ipv4 vrf UG-A-28
   bgp router-id 100.64.10.28
   redistribute connected
-  neighbor 192.168.28.2 inherit peer-session PEER_R8-2A
-  neighbor 192.168.28.2 inherit peer-policy EBGP
+  neighbor 172.24.28.2 inherit peer-session PEER_R8-2A
+  neighbor 172.24.28.2 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -124,7 +124,7 @@ int g2.48
  description *** From R8-2B to R2 ***
  encapsulation dot1Q 48
  ip vrf forwarding UG-B-48
- ip address 192.168.48.8 255.255.255.0
+ ip address 172.24.48.8 255.255.255.0
 !
 router bgp 8
  template peer-session PEER_R8-2B
@@ -133,7 +133,7 @@ router bgp 8
  exit-peer-session
  !
  address-family ipv4 vrf UG-B-48
-  neighbor 192.168.48.2 inherit peer-session PEER_R8-2B
-  neighbor 192.168.48.2 inherit peer-policy EBGP
+  neighbor 172.24.48.2 inherit peer-session PEER_R8-2B
+  neighbor 172.24.48.2 inherit peer-policy EBGP
  exit-address-family
 !
