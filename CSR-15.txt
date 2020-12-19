@@ -1,0 +1,148 @@
+!
+interface Loopback150
+ description ***MGMT_IF***
+ ip address 100.64.0.15 255.255.255.255
+!
+router bgp 15
+ template peer-policy EBGP
+  advertisement-interval 5
+  soft-reconfiguration inbound
+  allowas-in 3
+ exit-peer-policy
+!
+ template peer-policy IBGP
+  advertisement-interval 5
+  next-hop-self
+  soft-reconfiguration inbound
+  allowas-in 3
+ exit-peer-policy
+bgp router-id 100.64.0.15
+timers bgp 15 45
+!
+ip vrf UG-A-15
+ rd 100.64.10.15:10
+!
+interface Loopback15
+ description ***MGMT_UG-A-15***
+ ip vrf forwarding UG-A-15
+ ip address 100.64.10.15 255.255.255.255
+!
+int g2
+ no shut
+!
+int g2.515
+ description *** From R15-1A to R1 ***
+ encapsulation dot1Q 515
+ ip vrf forwarding UG-A-15
+ ip address 192.168.19.9 255.255.255.0
+!
+router bgp 15
+ template peer-session PEER_R15-1A
+  remote-as 65090
+  local-as 65019 no-prepend replace-as
+ exit-peer-session
+ !
+ address-family ipv4 vrf UG-A-15
+  bgp router-id 100.64.10.15
+  redistribute connected
+  neighbor 192.168.19.1 inherit peer-session PEER_R15-1A
+  neighbor 192.168.19.1 inherit peer-policy EBGP
+ exit-address-family
+!
+!
+ip vrf UG-B-35
+ rd 100.64.20.35:10
+!
+interface Loopback35
+ description ***MGMT_UG-B-35***
+ ip vrf forwarding UG-B-35
+ ip address 100.64.20.35 255.255.255.255
+!
+int g3
+ no shut
+!
+int g3.535
+ description *** From R15-1B to R1 ***
+ encapsulation dot1Q 535
+ ip vrf forwarding UG-B-35
+ ip address 192.168.39.9 255.255.255.0
+!
+router bgp 15
+ template peer-session PEER_R15-1B
+  remote-as 65090
+  local-as 65039 no-prepend replace-as
+ exit-peer-session
+ !
+ address-family ipv4 vrf UG-B-35
+  bgp router-id 100.64.20.35
+  redistribute connected
+  neighbor 192.168.39.1 inherit peer-session PEER_R15-1B
+  neighbor 192.168.39.1 inherit peer-policy EBGP
+ exit-address-family
+!
+!
+ip vrf UG-A-25
+ rd 100.64.10.25:10
+!
+interface Loopback25
+ description ***MGMT_UG-A-25***
+ ip vrf forwarding UG-A-25
+ ip address 100.64.10.25 255.255.255.255
+!
+int g4
+ no shut
+!
+int g4.525
+ description *** From R15-2A to R2 ***
+ encapsulation dot1Q 525
+ ip vrf forwarding UG-A-25
+ ip address 192.168.59.9 255.255.255.0
+!
+router bgp 15
+ template peer-session PEER_R15-2A
+  remote-as 65090
+  local-as 65029 no-prepend replace-as
+ exit-peer-session
+ !
+ address-family ipv4 vrf UG-A-25
+  bgp router-id 100.64.10.25
+  redistribute connected
+  neighbor 192.168.29.2 inherit peer-session PEER_R15-2A
+  neighbor 192.168.29.2 inherit peer-policy EBGP
+ exit-address-family
+!
+!
+ip vrf UG-B-45
+ rd 100.64.20.45:10
+!
+interface Loopback45
+ description ***MGMT_UG-B-45***
+ ip vrf forwarding UG-B-45
+ ip address 100.64.20.45 255.255.255.255
+!
+router bgp 15
+!
+ address-family ipv4 vrf UG-B-45
+  bgp router-id 100.64.20.45
+  redistribute connected
+!
+int g5
+ no shut
+!
+int g5.545
+ description *** From R15-2B to R2 ***
+ encapsulation dot1Q 545
+ ip vrf forwarding UG-B-45
+ ip address 192.168.49.9 255.255.255.0
+!
+router bgp 15
+ template peer-session PEER_R15-2B
+  remote-as 65090
+  local-as 65049 no-prepend replace-as
+ exit-peer-session
+ !
+ address-family ipv4 vrf UG-B-45
+  neighbor 192.168.49.2 inherit peer-session PEER_R15-2B
+  neighbor 192.168.49.2 inherit peer-policy EBGP
+ exit-address-family
+!
