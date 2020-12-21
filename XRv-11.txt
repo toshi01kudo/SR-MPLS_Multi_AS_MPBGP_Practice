@@ -201,11 +201,19 @@ router bgp 65090
 
 === Mgmt IF ===
 
+vrf MGMT
+ rd 10.10.0.43:30
+ address-family ipv4 unicast
+!
 interface MgmtEth0/RP0/CPU0/0
  description ***To_mgmt_nw***
+ vrf MGMT
  ipv4 address 10.10.0.41 255.255.255.0
 !
-telnet vrf default ipv4 server max-servers 16
+ipv4 access-list PERMIT-SSH 10 permit ipv4 10.10.0.0 0.0.0.255 any
+!
+ssh server v2
+ssh server vrf MGMT ipv4 access-list PERMIT-SSH
 
 
 === SR-TE Memo ===
