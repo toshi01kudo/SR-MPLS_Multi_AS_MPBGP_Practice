@@ -202,7 +202,7 @@ router bgp 65090
 === Mgmt IF ===
 
 vrf MGMT
- rd 10.10.0.43:30
+ rd 10.10.0.41:30
  address-family ipv4 unicast
 !
 interface MgmtEth0/RP0/CPU0/0
