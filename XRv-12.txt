@@ -159,13 +159,13 @@ interface GigabitEthernet0/0/0/0.28
  encap dot1Q 28
  description ***To_UG-A***
  vrf UG-A
- ipv4 address 172.24.28.1 255.255.255.0
+ ipv4 address 172.24.28.2 255.255.255.0
 !
 interface GigabitEthernet0/0/0/0.48
  description ***To_UG-B***
  encap dot1Q 48
  vrf UG-B
- ipv4 address 172.24.48.1 255.255.255.0
+ ipv4 address 172.24.48.2 255.255.255.0
 !
 router bgp 65090
  vrf UG-A
