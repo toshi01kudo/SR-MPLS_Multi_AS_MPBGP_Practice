@@ -1,5 +1,14 @@
 # SR-MPLS_Multi_AS_MPBGP_Practice
-Practice repository - Upload the config to work.
+Practice repository - Upload the config to work.\
+This is Backbone network with SR-MPLS which has multi AS for MP-BGP, and CE routers will be pingable from each edge. 
+
+SR-MPLS をベースにしたバックボーン環境を構築する。MP-BGPはマルチASとし、異なるASを接続した通信を実装する。
+
+## 前提条件
+Cisco 製品では、現時点でSRに対応しているのはCisco IOS XRのみ。\
+VMの上の仮想環境で構築する。
+* PE routers & P routers: Cisco XRv
+* CE routers: Cisco CSR 1000v
 
 ## Network diagram
 ### Layer 3 IP assignment
@@ -25,3 +34,7 @@ Practice repository - Upload the config to work.
 ルータ間接続はVLANで接続し、他の通信が干渉しないようにする。
 
 ![L2NWD](./L2NWD_SRMPLSv2.PNG)
+
+## Configuration
+参考URL: [IOS および IOS XR を使用したレイヤ 3 MPLS VPN INTER-AS オプション B の設定と検証](https://www.cisco.com/c/ja_jp/support/docs/multiprotocol-label-switching-mpls/mpls/200557-Configuration-and-Verification-of-Layer.html)
+
