@@ -70,6 +70,7 @@ router bgp 65090
   allocate-label all
  !
  address-family vpnv4 unicast
+  retain route-target all
  !
  neighbor 100.64.0.1
   remote-as 65090
