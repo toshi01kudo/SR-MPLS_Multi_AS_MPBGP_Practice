@@ -45,8 +45,8 @@ router bgp 9
  address-family ipv4 vrf UG-A-19
   bgp router-id 100.64.10.19
   redistribute connected
-  neighbor 172.24.19.1 inherit peer-session PEER_R9-1A
-  neighbor 172.24.19.1 inherit peer-policy EBGP
+  neighbor 172.24.19.5 inherit peer-session PEER_R9-1A
+  neighbor 172.24.19.5 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -73,8 +73,8 @@ router bgp 9
  address-family ipv4 vrf UG-B-39
   bgp router-id 100.64.20.39
   redistribute connected
-  neighbor 172.24.39.1 inherit peer-session PEER_R9-1B
-  neighbor 172.24.39.1 inherit peer-policy EBGP
+  neighbor 172.24.39.5 inherit peer-session PEER_R9-1B
+  neighbor 172.24.39.5 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -101,8 +101,8 @@ router bgp 9
  address-family ipv4 vrf UG-A-29
   bgp router-id 100.64.10.29
   redistribute connected
-  neighbor 172.24.29.2 inherit peer-session PEER_R9-2A
-  neighbor 172.24.29.2 inherit peer-policy EBGP
+  neighbor 172.24.29.6 inherit peer-session PEER_R9-2A
+  neighbor 172.24.29.6 inherit peer-policy EBGP
  exit-address-family
 !
 !
@@ -133,7 +133,7 @@ router bgp 9
  exit-peer-session
  !
  address-family ipv4 vrf UG-B-49
-  neighbor 172.24.49.2 inherit peer-session PEER_R9-2B
-  neighbor 172.24.49.2 inherit peer-policy EBGP
+  neighbor 172.24.49.6 inherit peer-session PEER_R9-2B
+  neighbor 172.24.49.6 inherit peer-policy EBGP
  exit-address-family
 !
