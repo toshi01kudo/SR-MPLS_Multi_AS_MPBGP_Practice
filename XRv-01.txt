@@ -70,6 +70,7 @@ router bgp 65091
   allocate-label all
  !
  address-family vpnv4 unicast
+  retain route-target all
  !
  neighbor 100.64.0.5
   remote-as 65091
@@ -101,7 +102,7 @@ router bgp 65091
  !
  neighbor 172.24.34.3
  remote-as 65090
- address-family ipv4 labeled-unicast
+ address-family vpnv4 unicast
  route-policy DEFAULT in
  route-policy DEFAULT out
  !
