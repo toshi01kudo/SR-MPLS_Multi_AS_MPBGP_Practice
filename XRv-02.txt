@@ -7,12 +7,12 @@ interface GigabitEthernet0/0/0/0
 interface GigabitEthernet0/0/0/0.56
  description ***To_BB_CiscoXR-08***
  encap dot1Q 56
- ipv4 address 192.168.56.1 255.255.255.0
+ ipv4 address 192.168.56.5 255.255.255.0
 !
 interface GigabitEthernet0/0/0/0.45
  description ***To_BB_CiscoXR-01***
  encap dot1Q 45
- ipv4 address 192.168.45.1 255.255.255.0
+ ipv4 address 192.168.45.5 255.255.255.0
 !
 router isis core
  net 49.0001.1000.6400.0005.00
@@ -26,7 +26,7 @@ router isis core
  interface Loopback5
   passive
   address-family ipv4 unicast
-   prefix-sid index 1001
+   prefix-sid index 1005
   !
  !
  interface GigabitEthernet0/0/0/0.56
