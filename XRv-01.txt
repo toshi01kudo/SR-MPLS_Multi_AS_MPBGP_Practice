@@ -172,7 +172,7 @@ interface Loopback20
  vrf UG-B
  ipv4 address 100.64.20.4 255.255.255.255
 !
-router bgp 65090
+router bgp 65091
  vrf UG-A
   address-family ipv4 unicast
    redistribute connected
