@@ -38,7 +38,7 @@ int g2.19
 !
 router bgp 9
  template peer-session PEER_R9-1A
-  remote-as 65090
+  remote-as 65091
   local-as 65019 no-prepend replace-as
  exit-peer-session
  !
@@ -66,7 +66,7 @@ int g2.39
 !
 router bgp 9
  template peer-session PEER_R9-1B
-  remote-as 65090
+  remote-as 65091
   local-as 65039 no-prepend replace-as
  exit-peer-session
  !
@@ -94,7 +94,7 @@ int g2.29
 !
 router bgp 9
  template peer-session PEER_R9-2A
-  remote-as 65090
+  remote-as 65091
   local-as 65029 no-prepend replace-as
  exit-peer-session
  !
@@ -128,7 +128,7 @@ int g2.49
 !
 router bgp 9
  template peer-session PEER_R9-2B
-  remote-as 65090
+  remote-as 65091
   local-as 65049 no-prepend replace-as
  exit-peer-session
  !
