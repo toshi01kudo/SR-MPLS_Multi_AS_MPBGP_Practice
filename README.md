@@ -35,6 +35,11 @@ VMの上の仮想環境で構築する。
 
 ![L2NWD](./L2NWD_SRMPLSv2.PNG)
 
+### Layer 1 Physical port assignment
+リソース節約のため、単一物理ネットワーク上に構築する。\
+L1レベルではすべて同じスイッチに所属しているように見える。
+
+
 ## 設計詳細
 
 * 参考URL: [IOS および IOS XR を使用したレイヤ 3 MPLS VPN INTER-AS オプション B の設定と検証](https://www.cisco.com/c/ja_jp/support/docs/multiprotocol-label-switching-mpls/mpls/200557-Configuration-and-Verification-of-Layer.html)
