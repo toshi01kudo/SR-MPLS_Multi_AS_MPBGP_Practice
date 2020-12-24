@@ -99,7 +99,7 @@ router bgp 65090
   address-family vpnv4 unicast
   !
  !
- neighbor 172.24.34.34
+ neighbor 172.24.34.4
  remote-as 65091
  address-family ipv4 labeled-unicast
  route-policy DEFAULT in
