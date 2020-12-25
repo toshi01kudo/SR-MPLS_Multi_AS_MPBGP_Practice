@@ -1,4 +1,4 @@
-# SR-MPLS_Multi_AS_MPBGP_Practice
+# SR-MPLS Multi AS MP-BGP Practice
 Practice repository - Upload the config to work.\
 This is Backbone network with SR-MPLS which has multi AS for MP-BGP, and CE routers will be pingable from each edge. 
 
