@@ -84,6 +84,9 @@ router bgp 65091
   address-family ipv4 labeled-unicast
   !
   address-family vpnv4 unicast
+   route-reflector-client
+   next-hop-self
+   soft-reconfiguration inbound always
   !
  !
  neighbor 100.64.0.6
@@ -98,6 +101,9 @@ router bgp 65091
   address-family ipv4 labeled-unicast
   !
   address-family vpnv4 unicast
+   route-reflector-client
+   next-hop-self
+   soft-reconfiguration inbound always
   !
  !
  neighbor 172.24.34.3
