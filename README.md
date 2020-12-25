@@ -45,6 +45,7 @@ L1レベルではすべて同じスイッチに所属しているように見え
 * 参考URL: [IOS および IOS XR を使用したレイヤ 3 MPLS VPN INTER-AS オプション B の設定と検証](https://www.cisco.com/c/ja_jp/support/docs/multiprotocol-label-switching-mpls/mpls/200557-Configuration-and-Verification-of-Layer.html)
 * 参考URL: [MPLS網にSegment Routingを適用してみよう](https://www.netone.co.jp/knowledge-center/blog-column/knowledge_takumi_175/)
 * 参考URL: [Segment Routing Configuration Guide for Cisco ASR 9000 Series Routers, IOS XR](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/segment-routing/configuration/guide/b-seg-routing-cg-asr9k.html)
+* 参考URL: [SR IGP Flex Algo - Segment Routing](https://www.segment-routing.net/images/sr-igp-flex-algo-rev4b-km1.pdf)
 
 
 ### Segment Routing のとは？
