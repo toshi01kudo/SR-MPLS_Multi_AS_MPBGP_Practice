@@ -19,6 +19,11 @@ interface GigabitEthernet0/0/0/0.34
  encap dot1Q 34
  ipv4 address 172.24.34.3 255.255.255.0
 !
+router static
+ address-family ipv4 unicast
+  172.24.34.4/32 GigabitEthernet0/0/0/0.34
+ !
+!
 router isis core
  net 49.0001.1000.6400.0003.00
  segment-routing global-block 16000 23999
