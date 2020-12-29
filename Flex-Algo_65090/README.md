@@ -6,6 +6,9 @@ SR-MPLSの醍醐味の一つとして、Flex-Algoがあったため、導入し�
 
 Related to the issue [#5](../../../issues/5)
 
+現時点でうまくいってないため、AS 65090側のみに実装し、65091側は通常のものと同一Configとする。
+
+
 ## Flex-Algo とは？
 Segment-Rougingが動作している区間について、仮想的に分離し、ポリシーに応じたTraffic Engineering (TE) が適用できるようにする技術。\
 従来のTEが基本的に全ルートを最短パス以外を通るようにしていたが、トラフィックの特性に応じた経路のチューニングができるようになる。
@@ -19,6 +22,8 @@ Segment-Rougingが動作している区間について、仮想的に分離し�
   - UG-A: `1628x`
   - UG-B: `1629x`
   - UG-C: `1630x`
+
+※以下の掲載図のうちAS 65090側のみ適用されており、AS 65091側は将来の想定像。
 
 ### Flex-Algo UG-A
 ![Flex-ALgo-UG-A](SR-MPLS_FA_UGA.PNG)
