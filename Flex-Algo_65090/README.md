@@ -12,13 +12,13 @@ Segment-Rougingが動作している区間について、仮想的に分離し�
 
 ## Flex-Algo Topology
 - Flex-Algo ID: 
-  - UG-A: 128
-  - UG-B: 129
-  - UG-C: 130
+  - UG-A: `128`
+  - UG-B: `129`
+  - UG-C: `130`
 - Flex-Algo Node SID (16000 + index):
-  - UG-A: 1628x
-  - UG-B: 1629x
-  - UG-C: 1630x
+  - UG-A: `1628x`
+  - UG-B: `1629x`
+  - UG-C: `1630x`
 
 ### Flex-Algo UG-A
 ![Flex-ALgo-UG-A](SR-MPLS_FA_UGA.PNG)
