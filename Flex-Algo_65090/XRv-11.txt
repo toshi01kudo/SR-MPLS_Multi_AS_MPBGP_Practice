@@ -1,0 +1,296 @@
+interface Loopback1
+ ipv4 address 100.64.0.1 255.255.255.255
+!
+interface GigabitEthernet0/0/0/0
+ no shutdown
+!
+interface GigabitEthernet0/0/0/0.12
+ description ***To_BB_CiscoXR-12***
+ encap dot1Q 12
+ ipv4 address 192.168.12.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/0.13
+ description ***To_BB_CiscoXR-13***
+ encap dot1Q 13
+ ipv4 address 192.168.13.1 255.255.255.0
+!
+router isis core
+ net 49.0001.1000.6400.0001.00
+ segment-routing global-block 16000 23999
+ distribute link-state instance-id 32 level 2 throttle 10
+ address-family ipv4 unicast
+  metric-style wide
+  segment-routing mpls
+  segment-routing bundle-member-adj-sid
+ !
+ interface Loopback1
+  passive
+  address-family ipv4 unicast
+   prefix-sid index 1001
+  !
+ !
+ interface GigabitEthernet0/0/0/0.12
+  point-to-point
+  address-family ipv4 unicast
+   fast-reroute per-prefix
+   fast-reroute per-prefix ti-lfa
+   adjacency-sid index 12
+  !
+ !
+ interface GigabitEthernet0/0/0/0.13
+  point-to-point
+  address-family ipv4 unicast
+   fast-reroute per-prefix
+   fast-reroute per-prefix ti-lfa
+   adjacency-sid index 13
+  !
+ !
+!
+route-policy PERMIT-ALL-IN
+  done
+end-policy
+!
+route-policy PERMIT-ALL-OUT
+  done
+end-policy
+!
+router bgp 65090
+ timers bgp 15 45
+ bgp router-id 100.64.0.1
+ address-family ipv4 unicast
+  allocate-label all
+ !
+ address-family vpnv4 unicast
+ !
+ neighbor 100.64.0.2
+  remote-as 65090
+  advertisement-interval 5
+  update-source Loopback1
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  !
+  address-family ipv4 labeled-unicast
+  !
+  address-family vpnv4 unicast
+  !
+ !
+ neighbor 100.64.0.3
+  remote-as 65090
+  advertisement-interval 5
+  update-source Loopback1
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  !
+  address-family ipv4 labeled-unicast
+  !
+  address-family vpnv4 unicast
+  !
+ !
+mpls ldp
+ mldp
+  logging notifications
+  address-family ipv4
+  !
+ !
+ router-id 100.64.0.1
+ address-family ipv4
+ !
+ interface GigabitEthernet0/0/0/0.12
+  address-family ipv4
+  !
+ !
+ interface GigabitEthernet0/0/0/0.13
+  address-family ipv4
+  !
+ !
+!
+segment-routing
+ global-block 16000 23999
+ adjacency-sid
+  interface GigabitEthernet0/0/0/0.12
+   address-family ipv4 unicast
+    l2-adjacency-sid absolute 15012 next-hop 192.168.12.2
+   !
+  !
+  interface GigabitEthernet0/0/0/0.13
+   address-family ipv4 unicast
+    l2-adjacency-sid absolute 15013 next-hop 192.168.13.3
+   !
+  !
+ !
+!
+
+=== VRF ===
+
+
+vrf UG-A
+ rd 100.64.10.1:10
+ address-family ipv4 unicast
+  import route-target
+   89:10
+  !
+  export route-target
+   89:10
+  !
+ !
+!
+vrf UG-B
+ rd 100.64.20.1:20
+ address-family ipv4 unicast
+  import route-target
+   89:20
+  !
+  export route-target
+   89:20
+  !
+ !
+!
+interface Loopback10
+ vrf UG-A
+ ipv4 address 100.64.10.1 255.255.255.255
+!
+interface Loopback20
+ vrf UG-B
+ ipv4 address 100.64.20.1 255.255.255.255
+!
+interface GigabitEthernet0/0/0/0.18
+ encap dot1Q 18
+ description ***To_UG-A***
+ vrf UG-A
+ ipv4 address 172.24.18.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/0.38
+ description ***To_UG-B***
+ encap dot1Q 38
+ vrf UG-B
+ ipv4 address 172.24.38.1 255.255.255.0
+!
+router bgp 65090
+ vrf UG-A
+  address-family ipv4 unicast
+   redistribute connected
+   allocate-label all
+  !
+  neighbor 172.24.18.8
+   remote-as 65018
+   advertisement-interval 5
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+   !
+  !
+ !
+ vrf UG-B
+  address-family ipv4 unicast
+   redistribute connected
+  !
+  neighbor 172.24.38.8
+   remote-as 65038
+   advertisement-interval 5
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+   !
+  !
+ !
+!
+
+=== Mgmt IF ===
+
+vrf MGMT
+ rd 10.10.0.41:30
+ address-family ipv4 unicast
+!
+interface MgmtEth0/RP0/CPU0/0
+ description ***To_mgmt_nw***
+ vrf MGMT
+ ipv4 address 10.10.0.41 255.255.255.0
+!
+ipv4 access-list PERMIT-SSH 10 permit ipv4 10.10.0.0 0.0.0.255 any
+!
+ssh server v2
+ssh server vrf MGMT ipv4 access-list PERMIT-SSH
+
+=== Flex-Algo ===
+
+segment-routing
+ traffic-eng
+  logging
+   policy status
+!
+
+vrf UG-A
+ address-family ipv4 unicast
+  export route-policy SET_COLOR_UGA
+!
+extcommunity-set opaque color128-uga-igp
+  128
+end-set
+!
+route-policy SET_COLOR_UGA
+  set extcommunity color color128-uga-igp
+  pass
+end-policy
+!
+segment-routing
+ traffic-eng
+  !
+  segment-list sl-uga
+   index 10 mpls label 16283
+  !
+  policy pol-uga
+   color 128 end-point ipv4 100.64.0.3
+   candidate-paths
+    preference 100
+     explicit segment-list sl-uga
+     !
+    !
+   !
+  !
+
+vrf UG-B
+ address-family ipv4 unicast
+  export route-policy SET_COLOR_UGB
+!
+extcommunity-set opaque color129-ugb-igp
+  129
+end-set
+!
+route-policy SET_COLOR_UGB
+  set extcommunity color color129-ugb-igp
+  pass
+end-policy
+!
+
+vrf UG-C
+ address-family ipv4 unicast
+  export route-policy SET_COLOR_UGC
+!
+extcommunity-set opaque color130-ugc-igp
+  130
+end-set
+!
+route-policy SET_COLOR_UGC
+  set extcommunity color color130-ugc-igp
+  pass
+end-policy
+!
+segment-routing
+ traffic-eng
+  !
+  segment-list sl-ugc
+   index 10 mpls label 16303
+  !
+  policy pol-ugc
+   color 130 end-point ipv4 100.64.0.3
+   candidate-paths
+    preference 100
+     explicit segment-list sl-ugc
+     !
+    !
+   !
+  !
