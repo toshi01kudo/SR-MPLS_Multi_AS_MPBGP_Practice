@@ -4,6 +4,8 @@ SR-MPLSの醍醐味の一つとして、Flex-Algoがあったため、導入し�
 、、、が、うまくいっていない結果となってしまっている。\
 現時点の状況をここに記載する。
 
+Related to the issue [#5](../../../issues/5)
+
 ## Flex-Algo とは？
 Segment-Rougingが動作している区間について、仮想的に分離し、ポリシーに応じたTraffic Engineering (TE) が適用できるようにする技術。\
 従来のTEが基本的に全ルートを最短パス以外を通るようにしていたが、トラフィックの特性に応じた経路のチューニングができるようになる。
@@ -29,8 +31,8 @@ Segment-Rougingが動作している区間について、仮想的に分離し�
 ![Flex-ALgo-UG-C](SR-MPLS_FA_UGC.PNG)
 
 ## 設計詳細
-参考URL: [Enabling Segment Routing Flexible Algorithm](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/asr9k-r6-6/segment-routing/configuration/guide/b-segment-routing-cg-asr9000-66x/b-segment-routing-cg-asr9000-66x_chapter_01111.html)
-参考URL: [SR IGP Flex-Algo](https://www.segment-routing.net/images/sr-igp-flex-algo-rev4b-km1.pdf)
+参考URL: [Enabling Segment Routing Flexible Algorithm](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/asr9k-r6-6/segment-routing/configuration/guide/b-segment-routing-cg-asr9000-66x/b-segment-routing-cg-asr9000-66x_chapter_01111.html)\
+参考URL: [SR IGP Flex-Algo](https://www.segment-routing.net/images/sr-igp-flex-algo-rev4b-km1.pdf)\
 参考URL: [Segment Routing Part II: Traffic Engineering](http://reader.epubee.com/books/mobile/ca/cacd5c24169cf915c7991980790aab66/text00010.html)
 
 
