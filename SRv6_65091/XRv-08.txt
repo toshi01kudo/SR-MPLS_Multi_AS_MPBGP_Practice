@@ -1,0 +1,182 @@
+! =======================================
+! - XRv-08
+! =======================================
+! =======================================
+! - Global
+! =======================================
+
+interface Loopback6
+ description ***Locator***
+ ipv4 address 100.64.0.6 255.255.255.255
+ ipv6 address fd00:6:6::6/128
+!
+interface GigabitEthernet0/0/0/0.46
+ description ***To_BB_CiscoXR-04***
+ ipv6 address fe80::46:6 link-local
+ ipv6 address fd00:46::6/64
+ encapsulation dot1q 46
+!
+interface GigabitEthernet0/0/0/0.56
+ description ***To_BB_CiscoXR-02***
+ ipv6 address fe80::56:6 link-local
+ ipv6 address fd00:56::6/64
+ encapsulation dot1q 56
+ no shut
+!
+route-policy PERMIT-ALL-IN
+  done
+end-policy
+!
+route-policy PERMIT-ALL-OUT
+  done
+end-policy
+!
+router isis core
+ net 49.0001.1000.6400.0006.00
+ distribute link-state
+ address-family ipv6 unicast
+  segment-routing srv6
+   locator No6
+ interface Loopback6
+  passive
+  address-family ipv6 unicast
+ interface GigabitEthernet0/0/0/0.46
+  address-family ipv6 unicast
+ interface GigabitEthernet0/0/0/0.56
+  address-family ipv6 unicast
+!
+router bgp 65091
+ timers bgp 15 45
+ bgp router-id 100.64.0.6
+ address-family ipv4 unicast
+  segment-routing srv6
+   locator No6
+ address-family vpnv4 unicast
+  segment-routing srv6
+   locator No6
+ address-family link-state link-state
+ !
+ neighbor fd00:4:4::4
+  remote-as 65091
+  advertisement-interval 5
+  description ***XRv-08***
+  update-source Loopback4
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  address-family vpnv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+ !
+ neighbor fd00:5:5::5
+  remote-as 65091
+  advertisement-interval 5
+  description ***XRv-08***
+  update-source Loopback4
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  address-family vpnv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+ !
+segment-routing
+ srv6
+  logging locator status
+  encapsulation
+   source-address fd00:6:6::6
+  !
+  locators
+   locator No6
+    prefix fd00:6:6::/64
+   !
+  !
+ !
+!
+
+
+
+! =======================================
+! - VRF
+! =======================================
+
+vrf UG-A
+ rd 100.64.10.6:10
+ address-family ipv4 unicast
+  import route-target
+   89:10
+  export route-target
+   89:10
+!
+vrf UG-B
+ rd 100.64.20.6:20
+ address-family ipv4 unicast
+  import route-target
+   89:20
+  export route-target
+   89:20
+!
+vrf UG-C
+ rd 100.64.30.6:30
+ address-family ipv4 unicast
+  import route-target
+   89:30
+  export route-target
+   89:30
+!
+interface Loopback10
+ vrf UG-A
+ ipv4 address 100.64.10.6 255.255.255.255
+!
+interface Loopback20
+ vrf UG-B
+ ipv4 address 100.64.20.6 255.255.255.255
+!
+interface Loopback30
+ vrf UG-C
+ ipv4 address 100.64.30.6 255.255.255.255
+!
+interface GigabitEthernet0/0/0/0.29
+ description ***To_UG-A***
+ vrf UG-A
+ ipv4 address 172.24.29.6 255.255.255.0
+ encapsulation dot1q 29
+!
+interface GigabitEthernet0/0/0/0.49
+ description ***To_UG-B***
+ vrf UG-B
+ ipv4 address 172.24.49.6 255.255.255.0
+ encapsulation dot1q 49
+!
+router bgp 65091
+ vrf UG-A
+  address-family ipv4 unicast
+   segment-routing srv6
+    alloc mode per-vrf
+   redistribute connected
+  neighbor 172.24.29.9
+   remote-as 65029
+   advertisement-interval 5
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+ !
+ vrf UG-B
+  address-family ipv4 unicast
+   segment-routing srv6
+    alloc mode per-ce
+   redistribute connected
+  neighbor 172.24.49.9
+   remote-as 65049
+   advertisement-interval 5
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+ !
+ vrf UG-C
+  address-family ipv4 unicast
+   segment-routing srv6
+    alloc mode per-vrf
+   redistribute connected
