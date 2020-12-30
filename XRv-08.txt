@@ -15,7 +15,7 @@ interface GigabitEthernet0/0/0/0.46
  ipv4 address 192.168.46.6 255.255.255.0
 !
 router isis core
- net 49.0001.1000.6400.0002.00
+ net 49.0001.1000.6400.0006.00
  segment-routing global-block 16000 23999
  distribute link-state instance-id 32 level 2 throttle 10
  address-family ipv4 unicast
