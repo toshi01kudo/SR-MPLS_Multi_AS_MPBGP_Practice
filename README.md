@@ -47,6 +47,7 @@ L1レベルではすべて同じスイッチに所属しているように見え
 * 参考URL: [MPLS網にSegment Routingを適用してみよう](https://www.netone.co.jp/knowledge-center/blog-column/knowledge_takumi_175/)
 * 参考URL: [Segment Routing Configuration Guide for Cisco ASR 9000 Series Routers, IOS XR](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/segment-routing/configuration/guide/b-seg-routing-cg-asr9k.html)
 * 参考URL: [SR IGP Flex Algo - Segment Routing](https://www.segment-routing.net/images/sr-igp-flex-algo-rev4b-km1.pdf)
+* 参考URL: [Segment Routingでよく聞かれること](https://note.com/ka_summary/n/n6ba56050774f)
 
 
 ### Segment Routing のとは？
