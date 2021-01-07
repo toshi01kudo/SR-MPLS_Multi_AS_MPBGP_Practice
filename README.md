@@ -484,3 +484,246 @@ fd00:5:5:0:45::             End.DX4      'UG-B':1                          bgp-6
 RP/0/RP0/CPU0:cisco-kudo-02#
 ```
 
+#### SRv6 ルート情報
+
+##### End.DT4 Egress ルート
+
+SRv6-VPNに入ってきて、HeadendとなるPEが処理し、他ノードへSRv6で配信するノードでの情報
+* SRv6-VPN SID: ```fd00:5:5:0:42::/128```
+
+```
+RP/0/RP0/CPU0:cisco-kudo-02#show bgp vpnv4 uni rd 100.64.10.5:10 100.64.10.19/32
+Thu Jan  7 10:26:19.202 UTC
+BGP routing table entry for 100.64.10.19/32, Route Distinguisher: 100.64.10.5:10
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                232         232
+    SRv6-VPN SID: fd00:5:5:0:42::/128
+Last Modified: Jan  7 05:20:28.381 for 05:05:51
+Paths: (2 available, best #1)
+  Advertised to update-groups (with more than one peer):
+    0.2
+  Path #1: Received by speaker 0
+  Advertised to update-groups (with more than one peer):
+    0.2
+  65019
+    172.24.19.9 from 172.24.19.9 (100.64.10.19)
+      Origin incomplete, metric 0, localpref 100, valid, external, best, group-best, import-candidate
+      Received Path ID 0, Local Path ID 1, version 232
+      Extended community: RT:89:10
+  Path #2: Received by speaker 0
+  Not advertised to any peer
+  65019, (received-only)
+    172.24.19.9 from 172.24.19.9 (100.64.10.19)
+      Origin incomplete, metric 0, localpref 100, valid, external
+      Received Path ID 0, Local Path ID 0, version 0
+```
+
+##### End.DT4 Ingress ルート
+SRv6-VPN経由で受信したルート\
+送信元のSID情報も合わせて受信している\
+```SRv6-VPN-SID: T1-fd00:6:6:0:42:: [total 1]```\
+また、Segment-list情報も受信している ```SRv6 SID-list { fd00:6:6:0:42:: }```\
+CEFテーブルから、下記もわかる。
+* Locator: ```fd00:6:6::/128```
+* Segment List: ```{fd00:6:6:0:42::}```
+* Next-hop IP: ```fe80::56:6```
+
+```
+RP/0/RP0/CPU0:cisco-kudo-02#show bgp vpnv4 uni rd 100.64.10.5:10 100.64.10.29/32
+Thu Jan  7 10:26:30.216 UTC
+BGP routing table entry for 100.64.10.29/32, Route Distinguisher: 100.64.10.5:10
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                235         235
+    SRv6-VPN SID: fd00:5:5:0:42::/128
+Last Modified: Jan  7 05:20:28.381 for 05:06:02
+Paths: (1 available, best #1)
+  Not advertised to any peer
+  Path #1: Received by speaker 0
+  Not advertised to any peer
+  65029, (received & used)
+    fd00:6:6::6 (metric 10) from fd00:6:6::6 (100.64.0.6)
+      Received Label 3
+      Origin incomplete, metric 0, localpref 100, valid, internal, best, group-best, import-candidate, imported
+      Received Path ID 0, Local Path ID 1, version 235
+      Extended community: RT:89:10
+      SRv6-VPN-SID: T1-fd00:6:6:0:42:: [total 1]
+      Source AFI: VPNv4 Unicast, Source VRF: default, Source Route Distinguisher: 100.64.10.6:10
+
+RP/0/RP0/CPU0:cisco-kudo-02#show route vrf UG-A 100.64.10.29/32 detail
+Thu Jan  7 10:37:03.674 UTC
+
+Routing entry for 100.64.10.29/32
+  Known via "bgp 65091", distance 200, metric 0
+  Tag 65029, type internal
+  Installed Jan  7 05:20:28.259 for 05:16:35
+  Routing Descriptor Blocks
+    fd00:6:6::6, from fd00:6:6::6
+      Nexthop in Vrf: "default", Table: "default", IPv6 Unicast, Table Id: 0xe0800000
+      Route metric is 0
+      Label: None
+      Tunnel ID: None
+      Binding Label: None
+      Extended communities count: 0
+      Source RD attributes: 0x0001:25664:168165386
+      NHID:0x0(Ref:0)
+      SRv6 Transit Type: T.Encaps.Red
+      SRv6 SID-list { fd00:6:6:0:42:: }
+  Route version is 0x1 (1)
+  No local label
+  IP Precedence: Not Set
+  QoS Group ID: Not Set
+  Flow-tag: Not Set
+  Fwd-class: Not Set
+  Route Priority: RIB_PRIORITY_RECURSIVE (12) SVD Type RIB_SVD_TYPE_REMOTE
+  Download Priority 3, Download Version 10
+  No advertising protos.
+
+RP/0/RP0/CPU0:cisco-kudo-02#show cef vrf UG-A 100.64.10.29/32 detail location 0/0/CPU0
+Thu Jan  7 10:40:47.265 UTC
+100.64.10.29/32, version 10, SRv6 Transit, internal 0x5000001 0x0 (ptr 0x197b5764) [1], 0x0 (0x0), 0x0 (0x1cd92418)
+ Updated Jan  7 05:20:28.424
+ Prefix Len 32, traffic index 0, precedence n/a, priority 3
+  gateway array (0x1e4af360) reference count 3, flags 0x2010, source rib (7), 0 backups
+                [1 type 3 flags 0x48441 (0x18d39658) ext 0x0 (0x0)]
+  LW-LDI[type=0, refc=0, ptr=0x0, sh-ldi=0x0]
+  gateway array update type-time 1 Jan  7 05:05:10.743
+ LDI Update time Jan  7 05:05:10.743
+
+  Level 1 - Load distribution: 0
+  [0] via fd00:6:6::/128, recursive
+
+   via fd00:6:6::/128, 9 dependencies, recursive [flags 0x6000]
+    path-idx 0 NHID 0x0 [0x19b48364 0x0]
+    next hop VRF - 'default', table - 0xe0800000
+    next hop fd00:6:6::/128 via fd00:6:6::/64
+    SRv6 T.Encaps.Red SID-list {fd00:6:6:0:42::}
+
+    Load distribution: 0 (refcount 1)
+
+    Hash  OK  Interface                 Address
+    0     Y   GigabitEthernet0/0/0/0.56 fe80::56:6
+```
+
+##### End.DX4 Egress ルート
+
+```
+RP/0/RP0/CPU0:cisco-kudo-02#show bgp vpnv4 uni rd 100.64.20.5:20 100.64.20.39/32
+Thu Jan  7 10:47:24.566 UTC
+BGP routing table entry for 100.64.20.39/32, Route Distinguisher: 100.64.20.5:20
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                231         231
+    SRv6-VPN SID: fd00:5:5:0:45::/128
+    Gateway Array ID: 1, Resilient per-CE nexthop set ID: 1
+Last Modified: Jan  7 05:20:28.381 for 05:26:56
+Paths: (2 available, best #1)
+  Advertised to update-groups (with more than one peer):
+    0.2
+  Path #1: Received by speaker 0
+  Advertised to update-groups (with more than one peer):
+    0.2
+  65039
+    172.24.39.9 from 172.24.39.9 (100.64.20.39)
+      Origin incomplete, metric 0, localpref 100, valid, external, best, group-best, import-candidate
+      Received Path ID 0, Local Path ID 1, version 231
+      Extended community: RT:89:20
+  Path #2: Received by speaker 0
+  Not advertised to any peer
+  65039, (received-only)
+    172.24.39.9 from 172.24.39.9 (100.64.20.39)
+      Origin incomplete, metric 0, localpref 100, valid, external
+      Received Path ID 0, Local Path ID 0, version 0
+```
+
+##### End.DX4 Ingress ルート
+
+
+```
+RP/0/RP0/CPU0:cisco-kudo-02#show bgp vpnv4 uni rd 100.64.20.5:20 100.64.20.49/32
+Thu Jan  7 10:48:07.907 UTC
+BGP routing table entry for 100.64.20.49/32, Route Distinguisher: 100.64.20.5:20
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                236         236
+Last Modified: Jan  7 05:20:28.381 for 05:27:39
+Paths: (1 available, best #1)
+  Not advertised to any peer
+  Path #1: Received by speaker 0
+  Not advertised to any peer
+  65049, (received & used)
+    fd00:6:6::6 (metric 10) from fd00:6:6::6 (100.64.0.6)
+      Received Label 3
+      Origin incomplete, metric 0, localpref 100, valid, internal, best, group-best, import-candidate, imported
+      Received Path ID 0, Local Path ID 1, version 236
+      Extended community: RT:89:20
+      SRv6-VPN-SID: T1-fd00:6:6:0:45:: [total 1]
+      Source AFI: VPNv4 Unicast, Source VRF: default, Source Route Distinguisher: 100.64.20.6:20
+
+RP/0/RP0/CPU0:cisco-kudo-02#show bgp vrf UG-B nexthop-set
+Thu Jan  7 10:51:17.510 UTC
+
+ Resilient per-CE nexthop set, ID 1
+ Number of nexthops 1, Label 0, Flags 0x2100
+ SRv6-VPN SID: fd00:5:5:0:45::/128
+ Nexthops:
+ 172.24.39.9
+ Reference count 2,
+
+RP/0/RP0/CPU0:cisco-kudo-02#show route vrf UG-B 100.64.20.49/32 detail
+Thu Jan  7 10:49:29.987 UTC
+
+Routing entry for 100.64.20.49/32
+  Known via "bgp 65091", distance 200, metric 0
+  Tag 65049, type internal
+  Installed Jan  7 05:20:28.259 for 05:29:01
+  Routing Descriptor Blocks
+    fd00:6:6::6, from fd00:6:6::6
+      Nexthop in Vrf: "default", Table: "default", IPv6 Unicast, Table Id: 0xe0800000
+      Route metric is 0
+      Label: None
+      Tunnel ID: None
+      Binding Label: None
+      Extended communities count: 0
+      Source RD attributes: 0x0001:25664:335937556
+      NHID:0x0(Ref:0)
+      SRv6 Transit Type: T.Encaps.Red
+      SRv6 SID-list { fd00:6:6:0:45:: }
+  Route version is 0x1 (1)
+  No local label
+  IP Precedence: Not Set
+  QoS Group ID: Not Set
+  Flow-tag: Not Set
+  Fwd-class: Not Set
+  Route Priority: RIB_PRIORITY_RECURSIVE (12) SVD Type RIB_SVD_TYPE_REMOTE
+  Download Priority 3, Download Version 10
+  No advertising protos.
+
+RP/0/RP0/CPU0:cisco-kudo-02#show cef vrf UG-B 100.64.20.49/32 detail location 0/0/CPU0
+Thu Jan  7 10:50:32.096 UTC
+100.64.20.49/32, version 10, SRv6 Transit, internal 0x5000001 0x0 (ptr 0x197b586c) [1], 0x0 (0x0), 0x0 (0x1cd92520)
+ Updated Jan  7 05:20:28.425
+ Prefix Len 32, traffic index 0, precedence n/a, priority 3
+  gateway array (0x1e4af618) reference count 1, flags 0x2010, source rib (7), 0 backups
+                [1 type 3 flags 0x48441 (0x18d3d2d0) ext 0x0 (0x0)]
+  LW-LDI[type=0, refc=0, ptr=0x0, sh-ldi=0x0]
+  gateway array update type-time 1 Jan  7 05:20:28.424
+ LDI Update time Jan  7 05:20:28.424
+
+  Level 1 - Load distribution: 0
+  [0] via fd00:6:6::/128, recursive
+
+   via fd00:6:6::/128, 9 dependencies, recursive [flags 0x6000]
+    path-idx 0 NHID 0x0 [0x19b48364 0x0]
+    next hop VRF - 'default', table - 0xe0800000
+    next hop fd00:6:6::/128 via fd00:6:6::/64
+    SRv6 T.Encaps.Red SID-list {fd00:6:6:0:45::}
+
+    Load distribution: 0 (refcount 1)
+
+    Hash  OK  Interface                 Address
+    0     Y   GigabitEthernet0/0/0/0.56 fe80::56:6
+```
+
+
