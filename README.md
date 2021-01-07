@@ -54,6 +54,14 @@ L1レベルではすべて同じスイッチに所属しているように見え
 
 ### Segment Routing のメリット
 
+Benefits
+* Ready for SDN: Segment routing was built for SDN and is the foundation for Application Engineered Routing (AER). SR prepares networks for business models, where applications can direct network behavior. SR provides the right balance between distributed intelligence and centralized optimization and programming.
+* Minimal configuration: Segment routing for TE requires minimal configuration on the source router.
+* Load balancing: Unlike in RSVP-TE, load balancing for segment routing can take place in the presence of equal cost multiple paths (ECMPs).
+* Supports Fast Reroute (FRR): Fast reroute enables the activation of a pre-configured backup path within 50 milliseconds of path failure.
+* Plug-and-Play deployment: Segment routing tunnels are interoperable with existing MPLS control and data planes and can be implemented in an existing deployment.
+
+
 ### SR-MPLS の基本設定とIGP
 * 参考URL: [MPLS網にSegment Routingを適用してみよう](https://www.netone.co.jp/knowledge-center/blog-column/knowledge_takumi_175/)
 * 参考URL: [Segment Routing Configuration Guide for Cisco ASR 9000 Series Routers, IOS XR](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/segment-routing/configuration/guide/b-seg-routing-cg-asr9k.html)
@@ -297,5 +305,5 @@ Label  Label       or ID              Interface                    Switched
 
 
 ### SRv6 の基本設定
-
+* 参考URL: [Segment Routing Configuration Guide for Cisco ASR 9000 Series Routers, IOS XR Release 6.6.x](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/asr9k-r6-6/segment-routing/configuration/guide/b-segment-routing-cg-asr9000-66x/b-segment-routing-cg-asr9000-66x_chapter_011.html)
 
