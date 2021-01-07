@@ -307,3 +307,180 @@ Label  Label       or ID              Interface                    Switched
 ### SRv6 の基本設定
 * 参考URL: [Segment Routing Configuration Guide for Cisco ASR 9000 Series Routers, IOS XR Release 6.6.x](https://www.cisco.com/c/en/us/td/docs/routers/asr9000/software/asr9k-r6-6/segment-routing/configuration/guide/b-segment-routing-cg-asr9000-66x/b-segment-routing-cg-asr9000-66x_chapter_011.html)
 
+#### Locatorの設定
+SRv6のノードを指し示す、Locator と Node SID を設定\
+ついでに、カプセル化する送信元アドレスも設定（任意）\
+合わせて、Locatorのステータス変更のログを取得（任意）
+
+```
+segment-routing
+ srv6
+  logging locator status
+  encapsulation
+   source-address fd00:5:5::5
+  !
+  locators
+   locator No5
+    prefix fd00:5:5::/64
+```
+
+#### IGPの設定
+IS-ISとOSPFv3の両方が利用可能。\
+今回はSR-MPLSと同様にIS-ISを利用する。\
+IPv6環境の上に構築するため、アドレスファミリーはIPv6のみで十分。
+
+```
+router isis core
+ net 49.0001.1000.6400.0005.00
+ distribute link-state
+ address-family ipv6 unicast
+  segment-routing srv6
+   locator No5
+ interface Loopback5
+  passive
+  address-family ipv6 unicast
+ interface GigabitEthernet0/0/0/0.45
+  address-family ipv6 unicast
+ interface GigabitEthernet0/0/0/0.56
+  address-family ipv6 unicast
+```
+
+#### Overlay MP-BGP - iBGP 設定
+本検証当時(Dec. 2020)、End.DT6等のIPv6をVPN上でやりとりする機能がCisco機器に実装されておらず、End.DT4 or DX4のみであったため、\
+アドレスファミリーはIPv4とVPNv4のみとし、IPv6関連は設定しない。\
+IPv6関連が実装されるのはしばらく先になる見込み。
+
+
+```
+router bgp 65091
+ timers bgp 15 45
+ bgp router-id 100.64.0.5
+ address-family ipv4 unicast
+  segment-routing srv6
+   locator No5
+ address-family vpnv4 unicast
+  segment-routing srv6
+   locator No5
+ address-family link-state link-state
+ !
+ neighbor fd00:4:4::4
+  remote-as 65091
+  description ***XRv-01***
+  update-source Loopback4
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  address-family vpnv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+```
+
+#### Overlay MP-BGP - eBGP + VRF 設定
+VRFごとにFunctionの指定が可能。ただ、VRFテーブル⇔グローバルテーブルの変換を行う場合は基本的に```End.DT4```を利用。
+
+* Per-VRF mode: ```End.DT4```. End.DT4 represents the Endpoint with decapsulation and IPv4 table lookup.
+* Per-CE mode: ```End.DX4```. End.DX4 represents the Endpoint with decapsulation and IPv4 cross-connect.
+
+```
+router bgp 65091
+ vrf UG-A
+  address-family ipv4 unicast
+   segment-routing srv6
+    alloc mode per-vrf
+   redistribute connected
+  neighbor 172.24.19.9
+   remote-as 65019
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+```
+
+
+### SR-MPLSの状態確認
+
+#### ルーティングテーブル
+
+```
+UG-A: 
+B    100.64.10.19/32 [20/0] via 172.24.19.9, 00:36:42
+B    100.64.10.29/32 [200/0] via fd00:6:6::6 (nexthop in vrf default), 00:36:42
+```
+
+#### SRv6 情報
+
+```
+RP/0/RP0/CPU0:cisco-kudo-02#show segment-routing srv6 manager
+Thu Jan  7 10:13:06.339 UTC
+Parameters:
+  SRv6 Enabled: Yes
+  Encapsulation:
+    Source Address:
+      Configured: fd00:5:5::5
+      Default: fd00:5:5::5
+    Hop-Limit: Default
+Summary:
+  Number of Locators: 1 (1 operational)
+  Number of SIDs: 8 (0 stale)
+  Max SIDs: 8000
+  OOR:
+    Thresholds: Green 400, Warning 240
+    Status: Resource Available (0 cleared, 0 warnings, 0 full)
+Platform Capabilities:
+  SRv6: Yes
+  TILFA: Yes
+  Microloop-Avoidance: Yes
+  End Functions:
+    End (PSP)
+    End.X (PSP)
+    End.DX4
+    End.DT4
+    End.OP
+  Transit Functions:
+    T
+    T.Insert.Red
+    T.Encaps.Red
+  Security rules:
+    SEC-1
+    SEC-2
+    SEC-3
+    SEC-4
+  Counters:
+    CNT-1
+    CNT-3
+  Signaled Parameters:
+    Max-SL          : 4
+    Max-End-Pop-SRH : 4
+    Max-T-Insert    : 4
+    Max-T-Encap     : 5
+    Max-End-D       : 5
+  Max SIDs: 8000
+  SID Holdtime: 30 mins
+RP/0/RP0/CPU0:cisco-kudo-02#
+RP/0/RP0/CPU0:cisco-kudo-02#show segment-routing srv6 locator No5 detail
+Thu Jan  7 10:13:42.187 UTC
+Name                  ID       Prefix                    Status
+--------------------  -------  ------------------------  -------
+No5*                  1        fd00:5:5::/64             Up
+  Interface:
+    Name: srv6-No5
+    IFH : 0x00000014
+    IPv6 address: fd00:5:5::/64
+  Chkpt Obj ID: 0x2f60
+  Created: Jan  7 05:02:14.468 (05:11:27 ago)
+RP/0/RP0/CPU0:cisco-kudo-02#
+RP/0/RP0/CPU0:cisco-kudo-02#show segment-routing srv6 locator No5 sid
+Thu Jan  7 10:14:01.102 UTC
+SID                         Behavior     Context                           Owner               State  RW
+--------------------------  -----------  ------------------------------    ------------------  -----  --
+fd00:5:5:0:1::              End (PSP)    'default':1                       sidmgr              InUse  Y
+fd00:5:5:0:11::             End.OP       'default'                         sidmgr              InUse  Y
+fd00:5:5:0:40::             End.X (PSP)  [Gi0/0/0/0.56, Link-Local]        isis-core           InUse  Y
+fd00:5:5:0:41::             End.X (PSP)  [Gi0/0/0/0.45, Link-Local]        isis-core           InUse  Y
+fd00:5:5:0:42::             End.DT4      'UG-A'                            bgp-65091           InUse  Y
+fd00:5:5:0:43::             End.DT4      'UG-B'                            bgp-65091           InUse  Y
+fd00:5:5:0:44::             End.DT4      'UG-C'                            bgp-65091           InUse  Y
+fd00:5:5:0:45::             End.DX4      'UG-B':1                          bgp-65091           InUse  Y
+RP/0/RP0/CPU0:cisco-kudo-02#
+```
+
