@@ -152,8 +152,148 @@ router isis core
    fast-reroute per-prefix ti-lfa
 ```
 
+#### Overlay MP-BGP - iBGP 設定
+基本的にはMPLSと特に設定差分は存在しない。\
+VRF上のユーザプレフィックスを伝搬するのはVPNv4アドレスファミリーなので、必ず設定する。\
+また、Route-Reflectorとして動作させる機器には```route-reflector-client```も設定する。
+
+```
+router bgp 65090
+ bgp router-id 100.64.0.1
+ address-family ipv4 unicast
+ address-family vpnv4 unicast
+ !
+neighbor 100.64.0.2
+  remote-as 65090
+  update-source Loopback1
+  address-family ipv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+  address-family ipv4 labeled-unicast
+  address-family vpnv4 unicast
+   next-hop-self
+   soft-reconfiguration inbound always
+```
+
+#### Overlay MP-BGP - eBGP + VRF 設定
+基本的にはMPLSと特に設定差分は存在しない。\
+XRvの制約として、eBGPにroute-policy適用が必須となっているので注意。
+
+```
+vrf UG-A
+ rd 100.64.10.1:10
+ address-family ipv4 unicast
+  import route-target
+   89:10
+  !
+  export route-target
+   89:10
+router bgp 65090
+ vrf UG-A
+  address-family ipv4 unicast
+   redistribute connected
+  !
+  neighbor 172.24.18.8
+   remote-as 65018
+   address-family ipv4 unicast
+    route-policy PERMIT-ALL-IN in
+    route-policy PERMIT-ALL-OUT out
+    soft-reconfiguration inbound always
+```
+
 
 ### Segment Routing 環境での Inter AS MP-BGP
+基本的にはMPLSと特に設定差分は存在しない。\
+XRvの制約として、eBGPピア向けのStaticが必須となっているので注意。（バグか？）
+
+```
+router static
+ address-family ipv4 unicast
+  172.24.34.4/32 GigabitEthernet0/0/0/0.34
+ !
+router bgp 65090
+ neighbor 172.24.34.4
+ remote-as 65091
+ address-family vpnv4 unicast
+ route-policy DEFAULT in
+ route-policy DEFAULT out
+```
+
+### SR-MPLSの状態確認
+
+#### ルーティングテーブル
+TI-LFAが有効化されているため、IGP部分については2行表示されている。
+
+```
+i L1 100.64.0.2/32 [115/10] via 192.168.12.2, 05:42:41, GigabitEthernet0/0/0/0.12
+                   [115/20] via 192.168.13.3, 05:42:41, GigabitEthernet0/0/0/0.13 (!)
+i L1 100.64.0.3/32 [115/20] via 192.168.12.2, 05:42:41, GigabitEthernet0/0/0/0.12 (!)
+                   [115/10] via 192.168.13.3, 05:42:41, GigabitEthernet0/0/0/0.13
+```
+
+#### LFIBテーブル
+```SR Pfx (idx 1002)```の部分が他のNode SID。\
+一部、Flex-Algoの設定箇所についてNode-SIDやSR-TEのラベルが増えている。
+
+```
+RP/0/RP0/CPU0:cisco-kudo-11#show mpls forwarding
+
+Wed Dec 30 08:19:22.230 UTC
+Local  Outgoing    Prefix             Outgoing     Next Hop        Bytes       
+Label  Label       or ID              Interface                    Switched    
+------ ----------- ------------------ ------------ --------------- ------------
+15012  Pop         SRLB (idx 12)      Gi0/0/0/0.12 192.168.12.2    0           
+15013  Pop         SRLB (idx 13)      Gi0/0/0/0.13 192.168.13.3    0           
+16281  16281       SR Pfx (idx 281)   Gi0/0/0/0.13 192.168.13.3    0           
+16282  16282       SR Pfx (idx 282)   Gi0/0/0/0.13 192.168.13.3    0           
+16283  Pop         SR Pfx (idx 283)   Gi0/0/0/0.13 192.168.13.3    0           
+16291  16291       SR Pfx (idx 291)   Gi0/0/0/0.13 192.168.13.3    0           
+       16291       SR Pfx (idx 291)   Gi0/0/0/0.12 192.168.12.2    0           
+16292  Pop         SR Pfx (idx 292)   Gi0/0/0/0.12 192.168.12.2    0           
+       16292       SR Pfx (idx 292)   Gi0/0/0/0.13 192.168.13.3    0            (!)
+16293  Pop         SR Pfx (idx 293)   Gi0/0/0/0.13 192.168.13.3    0           
+       16293       SR Pfx (idx 293)   Gi0/0/0/0.12 192.168.12.2    0            (!)
+16301  16301       SR Pfx (idx 301)   Gi0/0/0/0.13 192.168.13.3    0           
+       16301       SR Pfx (idx 301)   Gi0/0/0/0.12 192.168.12.2    0           
+16302  Pop         SR Pfx (idx 302)   Gi0/0/0/0.12 192.168.12.2    0           
+16303  Pop         SR Pfx (idx 303)   Gi0/0/0/0.13 192.168.13.3    0           
+17002  Pop         SR Pfx (idx 1002)  Gi0/0/0/0.12 192.168.12.2    11614       
+       17002       SR Pfx (idx 1002)  Gi0/0/0/0.13 192.168.13.3    0            (!)
+17003  Pop         SR Pfx (idx 1003)  Gi0/0/0/0.13 192.168.13.3    15455       
+       17003       SR Pfx (idx 1003)  Gi0/0/0/0.12 192.168.12.2    0            (!)
+24000  Pop         SR Adj (idx 0)     Gi0/0/0/0.13 192.168.13.3    0           
+       17003       SR Adj (idx 0)     Gi0/0/0/0.12 192.168.12.2    0            (!)
+24001  Pop         SR Adj (idx 2)     Gi0/0/0/0.13 192.168.13.3    0           
+24002  Pop         SR Adj (idx 1)     Gi0/0/0/0.13 192.168.13.3    0           
+       17003       SR Adj (idx 1)     Gi0/0/0/0.12 192.168.12.2    0            (!)
+24003  Pop         SR Adj (idx 3)     Gi0/0/0/0.13 192.168.13.3    0           
+24004  Pop         SR Adj (idx 0)     Gi0/0/0/0.12 192.168.12.2    0           
+       17002       SR Adj (idx 0)     Gi0/0/0/0.13 192.168.13.3    0            (!)
+24005  Pop         SR Adj (idx 2)     Gi0/0/0/0.12 192.168.12.2    0           
+24006  Pop         SR Adj (idx 1)     Gi0/0/0/0.12 192.168.12.2    0           
+       17002       SR Adj (idx 1)     Gi0/0/0/0.13 192.168.13.3    0            (!)
+24007  Pop         SR Adj (idx 3)     Gi0/0/0/0.12 192.168.12.2    0           
+24008  Pop         192.168.23.0/24    Gi0/0/0/0.12 192.168.12.2    0           
+       Pop         192.168.23.0/24    Gi0/0/0/0.13 192.168.13.3    0           
+24009  Pop         100.64.0.3/32      Gi0/0/0/0.13 192.168.13.3    158723      
+       24009       100.64.0.3/32      Gi0/0/0/0.12 192.168.12.2    0            (!)
+24010  Pop         100.64.0.2/32      Gi0/0/0/0.12 192.168.12.2    151294      
+       24009       100.64.0.2/32      Gi0/0/0/0.13 192.168.13.3    0            (!)
+24011  Aggregate   UG-A: Per-VRF Aggr[V]   \
+                                      UG-A                         1020        
+24012  24012       100.64.10.3/32[V]               100.64.0.3      0           
+24020  Aggregate   UG-B: Per-VRF Aggr[V]   \
+                                      UG-B                         0           
+24021  24012       100.64.10.2/32[V]               100.64.0.2      0           
+24022  24012       172.24.28.0/24[V]               100.64.0.2      0           
+24025  Pop         No ID              srte_c_128_e point2point     0           
+24026  Pop         No ID              srte_c_130_e point2point     0           
+24027  Pop         SR TE: 1 [TE-INT]  Gi0/0/0/0.13 192.168.13.3    0           
+24028  Pop         SR TE: 2 [TE-INT]  Gi0/0/0/0.13 192.168.13.3    0           
+24029  Unlabelled  100.64.10.18/32[V] Gi0/0/0/0.18 172.24.18.8     0           
+24030  Unlabelled  100.64.20.38/32[V] Gi0/0/0/0.38 172.24.38.8     0           
+24031  24030       100.64.10.28/32[V]              100.64.0.2      0           
+```
 
 
 ### SRv6 の基本設定
